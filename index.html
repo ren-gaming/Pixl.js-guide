@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixl.js Amiibo Emulator: Device Guide</title>
+<meta name="description" content="A plain-language guide to the Pixl.js Amiibo emulator: what it does, what is on it, and how to update it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #e4eaf3;
+    --card: #f5f8fc;
+    --ink: #17224f;
+    --muted: #4a5578;
+    --rule: #b9c4da;
+    --warn: #b8410d;
+    --warn-bg: #fbe9df;
+    --display: "Pixelify Sans", ui-monospace, "Courier New", monospace;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 1.125rem; line-height: 1.7; }
+  a { color: var(--ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+  a:hover { color: var(--warn); }
+  a:focus-visible { outline: 3px solid var(--warn); outline-offset: 3px; }
+
+  .layout { max-width: 70rem; margin: 0 auto; padding: 0 1.5rem; display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 3.5rem; }
+  nav.toc { position: sticky; top: 0; align-self: start; padding: 3rem 0; font-family: var(--sans); font-size: 1rem; }
+  nav.toc .site { font-family: var(--display); font-weight: 700; font-size: 1.25rem; line-height: 1.15; margin: 0 0 1.5rem; display: block; text-decoration: none; }
+  nav.toc ul { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--rule); }
+  nav.toc li a { display: block; padding: 0.35rem 0 0.35rem 1rem; margin-left: -2px; border-left: 2px solid transparent; text-decoration: none; color: var(--muted); }
+  nav.toc li a:hover { color: var(--ink); border-left-color: var(--ink); }
+
+  main { padding: 3rem 0 4rem; max-width: 42rem; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.2rem, 6vw, 3.4rem); line-height: 1.05; margin: 0 0 1rem; }
+  .intro { font-size: 1.3rem; line-height: 1.55; margin: 0 0 3rem; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 1.8rem; line-height: 1.15; margin: 3.5rem 0 1rem; padding-top: 1.5rem; border-top: 2px solid var(--ink); }
+  p { margin: 0 0 1.1rem; }
+  ul.list, ol.list { padding-left: 1.3rem; margin: 0 0 1.2rem; }
+  ul.list li, ol.list li { margin-bottom: 0.6rem; }
+  .aside { font-family: var(--sans); font-size: 1rem; line-height: 1.55; background: var(--card); border: 2px solid var(--ink); padding: 1rem 1.2rem; margin: 1.5rem 0; }
+  .aside.warn { background: var(--warn-bg); border-color: var(--warn); }
+  .aside p { margin: 0; }
+  .aside strong { font-weight: 600; }
+
+  /* The one memorable element: the app list drawn like the device's own menu */
+  .menu { background: #1b2a63; border-radius: 10px; padding: 1.1rem; margin: 1.5rem 0 1rem; box-shadow: 0 0 0 2px var(--ink); }
+  .menu ul { list-style: none; margin: 0; padding: 0; background: #0f1738; color: #dbe4ff; font-family: var(--display); font-size: 1.1rem; line-height: 1.35; border-radius: 4px; padding: 0.6rem 0; }
+  .menu li { display: grid; grid-template-columns: 1fr; padding: 0.6rem 1.1rem; }
+  .menu li:first-child { background: #dbe4ff; color: #0f1738; }
+  .menu .name { font-weight: 700; }
+  .menu .what { font-family: var(--sans); font-size: 0.95rem; opacity: 0.85; }
+  .menu-note { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); margin: 0 0 1.5rem; }
+
+  code { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 0.88em; background: var(--card); border: 1px solid var(--rule); padding: 0.05em 0.35em; border-radius: 3px; }
+  dl.links { margin: 0; font-family: var(--sans); }
+  dl.links dt { font-weight: 600; margin-top: 1rem; }
+  dl.links dd { margin: 0.1rem 0 0; color: var(--muted); }
+
+
+  /* Help button */
+  .help-btn { display: inline-flex; align-items: center; gap: 0.6rem; background: #4752c4; color: #fff; font-family: var(--sans); font-weight: 600; font-size: 1rem; line-height: 1.2; text-decoration: none; padding: 0.7rem 1.1rem; border-radius: 6px; border: 2px solid #2d3585; }
+  .help-btn:hover { background: #2d3585; color: #fff; }
+  .help-btn svg { width: 1.4rem; height: 1.4rem; flex: none; }
+  nav.toc .help-btn { margin-top: 1.75rem; }
+
+  footer { max-width: 42rem; padding: 0 0 3rem; font-family: var(--sans); font-size: 0.95rem; color: var(--muted); }
+  footer p { margin: 0 0 0.4rem; }
+
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    nav.toc { position: static; padding: 2rem 0 0; }
+    nav.toc ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; border-left: 0; }
+    nav.toc li a { padding: 0.2rem 0; margin: 0; border-left: 0; text-decoration: underline; }
+    main { padding-top: 1.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc" aria-label="On this page">
+    <a class="site" href="#top">Pixl.js<br>device guide</a>
+    <ul>
+      <li><a href="#what">What it is</a></li>
+      <li><a href="#apps">Apps on the device</a></li>
+      <li><a href="#key">Before you start</a></li>
+      <li><a href="#update">Updating firmware</a></li>
+      <li><a href="#mochi">Add Amiibo with Mochi</a></li>
+      <li><a href="#help">Get help</a></li>
+      <li><a href="#links">Official links</a></li>
+    </ul>
+    <!-- TODO: replace YOUR-INVITE with your Discord invite code -->
+    <a class="help-btn" href="https://discord.gg/YOUR-INVITE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v11H11l-5 4v-4H4z"/><circle cx="9" cy="10.5" r="0.6" fill="currentColor"/><circle cx="12" cy="10.5" r="0.6" fill="currentColor"/><circle cx="15" cy="10.5" r="0.6" fill="currentColor"/></svg>Get help on Discord</a>
+  </nav>
+
+  <div id="top">
+    <main>
+      <h1>Pixl.js Amiibo emulator</h1>
+      <p class="intro">A small Bluetooth device with a screen that can act as an Amiibo. This page covers what is on it, what to set up first, and how updates work.</p>
+
+      <h2 id="what">What it is</h2>
+      <p>The Pixl.js Amiibo firmware turns a small NFC and Bluetooth device into an Amiibo emulator. You pick an Amiibo on the device, then hold it to a game or console that reads Amiibo.</p>
+      <div class="aside">
+        <p><strong>Two different things share the name.</strong> The original Pixl.js is a general-purpose device that runs Espruino. The Amiibo emulator described here is a separate project by solosky with its own firmware and hardware. If you search for help, check that the guide you find is for the Amiibo firmware, because the update steps are different.</p>
+      </div>
+
+      <h2 id="apps">Apps on the device</h2>
+      <p>The firmware is organised as a menu of small apps. The project documentation lists these:</p>
+      <div class="menu" role="img" aria-label="Menu showing the apps on the device">
+        <ul>
+          <li><span class="name">Amiibo Emulator</span><span class="what">Pick an Amiibo and emulate it</span></li>
+          <li><span class="name">Amiibo Database</span><span class="what">Browse and search a built-in library</span></li>
+          <li><span class="name">AmiiboLink Emulator</span><span class="what">Work with AmiiboLink over Bluetooth</span></li>
+          <li><span class="name">Card Emulator</span><span class="what">Emulate other NFC cards</span></li>
+          <li><span class="name">BLE File Transfer</span><span class="what">Send files to the device over Bluetooth</span></li>
+          <li><span class="name">Settings</span><span class="what">Configure the device</span></li>
+        </ul>
+      </div>
+      <p class="menu-note">Illustration of the idea. Your device's menu may look different and can change between firmware versions.</p>
+
+      <h2 id="key">Before you start</h2>
+      <p>Some features need a file called <code>key_retail.bin</code> on the device's storage. The project documentation says it has to be a copy you obtained legally, for example from your own console, and that it goes in the root of the device storage. Without it, those features will not work.</p>
+      <p>Whether you need to add it yourself depends on where the device came from. Some devices ship with <code>key_retail.bin</code> already installed, and some do not. If yours does not have it, you will need to add it yourself, using a copy you have the right to use.</p>
+      <div class="aside warn">
+        <p><strong>Only use files you have the right to use.</strong> The project does not supply this key, and neither does this page.</p>
+      </div>
+
+      <h2 id="update">Updating firmware</h2>
+      <p>The first install of the firmware on blank hardware needs a hardware programmer such as a J-Link or DAPLink. Most devices arrive with it already installed. After that, updates can be sent over the air.</p>
+      <ul class="list">
+        <li>Put the device into its update (DFU) mode, then use nRF Connect or the project's web page to send the new firmware. The <a href="#mochi">Mochi</a> web page below can also do this for you.</li>
+        <li>On iOS, the release notes recommend the iNFC or MTools BLE apps for one-tap updates.</li>
+        <li>Download firmware only from the project's releases page, and read the notes for each version before updating. Some releases are bug-fix versions.</li>
+      </ul>
+      <p>How to enter update mode depends on your hardware, so follow the flashing guide in the project documentation rather than a generic one.</p>
+
+      <h2 id="mochi">Add Amiibo and update firmware with Mochi</h2>
+      <p>Mochi is a web page made by someone else that connects to the device over Bluetooth, so you can manage its files and update its firmware from a browser. There is nothing to install.</p>
+      <p><a href="https://tasken.github.io/Mochi/">Open Mochi</a></p>
+      <ul class="list">
+        <li><strong>Connect:</strong> turn on Bluetooth, open the page in Chrome or Edge, and choose Connect device.</li>
+        <li><strong>Add Amiibo:</strong> drag files or folders onto the page, or click to choose them. They go into a queue, and you start the transfer when you are ready. You can also compare a folder with what is already on the device.</li>
+        <li><strong>Update firmware:</strong> open Actions, choose Update firmware, and pick your model (the white LCD version or the black OLED version). Mochi downloads the matching official firmware for you, or you can pick your own .zip file.</li>
+      </ul>
+      <div class="aside warn">
+        <p><strong>Take care with two actions.</strong> If an update is interrupted, the device can stay in update mode. Mochi says you can fix this by retrying with the correct file. The Actions menu also has a Format drive option, so check before you use it.</p>
+      </div>
+      <p>Mochi is not part of the Pixl.js project and is not maintained by this site. Check that it works with your device before relying on it.</p>
+
+      <h2 id="help">Get help</h2>
+      <p>Stuck on a setup step, an update that will not finish, or an Amiibo that will not load? Ask in the Discord server. It helps to say which device you have, your firmware version, and what you were doing when it went wrong.</p>
+      <!-- TODO: replace YOUR-INVITE with your Discord invite code -->
+      <p><a class="help-btn" href="https://discord.gg/YOUR-INVITE" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v11H11l-5 4v-4H4z"/><circle cx="9" cy="10.5" r="0.6" fill="currentColor"/><circle cx="12" cy="10.5" r="0.6" fill="currentColor"/><circle cx="15" cy="10.5" r="0.6" fill="currentColor"/></svg>Join the Discord server</a></p>
+
+      <h2 id="links">Official links</h2>
+      <dl class="links">
+        <dt><a href="https://github.com/solosky/pixl.js">solosky/pixl.js on GitHub</a></dt>
+        <dd>Source code, hardware files, and the main project page.</dd>
+        <dt><a href="https://github.com/solosky/pixl.js/releases">Releases</a></dt>
+        <dd>Firmware downloads with notes for each version.</dd>
+        <dt><a href="https://github.com/solosky/pixl.js/blob/main/docs/en/README.md">English documentation</a></dt>
+        <dd>Flashing guide, app descriptions, and protocol details.</dd>
+      </dl>
+    </main>
+
+    <footer>
+      <p>An unofficial fan guide. Not affiliated with or endorsed by Nintendo or the Pixl.js project.</p>
+      <p>Amiibo is a trademark of Nintendo.</p>
+    </footer>
+  </div>
+
+</div>
+</body>
+</html>
